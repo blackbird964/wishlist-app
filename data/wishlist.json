@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1733139464541,
+    "productId": "1733139464518",
+    "productTitle": "Cool hat",
+    "price": 20,
+    "contributions": [
+      {
+        "id": 1733139477250,
+        "amount": 4,
+        "customerEmail": "test@gmail.com",
+        "anonymous": false,
+        "createdAt": "2024-12-02T11:37:57.250Z"
+      },
+      {
+        "id": 1733290491833,
+        "amount": 16,
+        "customerEmail": "test@gmail.com",
+        "anonymous": false,
+        "createdAt": "2024-12-04T05:34:51.833Z"
+      }
+    ],
+    "totalContributed": 20,
+    "fulfilled": true,
+    "createdAt": "2024-12-02T11:37:44.541Z"
+  }
+]
