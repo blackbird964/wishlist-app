@@ -1,0 +1,2 @@
+name = "Wishlist App"
+scopes = "write_products,read_products,write_orders"
