@@ -1,73 +1,46 @@
+// src/services/storage.js
 import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export class WishlistStorage {
-    constructor() {
-        this.filePath = './data/wishlist.json';
+  constructor() {
+    this.filePath = path.join(__dirname, '../../data/wishlist.json');
+  }
+
+  async getItems() {
+    try {
+      const data = await fs.readFile(this.filePath, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        await this.saveItems([]);
+        return [];
+      }
+      throw error;
     }
+  }
 
-    async readWishlist() {
-        try {
-            const data = await fs.readFile(this.filePath, 'utf8');
-            return JSON.parse(data);
-        } catch (error) {
-            console.error('Error reading wishlist:', error);
-            return [];
-        }
-    }
+  async saveItems(items) {
+    const dirPath = path.dirname(this.filePath);
+    await fs.mkdir(dirPath, { recursive: true });
+    await fs.writeFile(this.filePath, JSON.stringify(items, null, 2));
+  }
 
-    async saveWishlist(wishlist) {
-        try {
-            await fs.writeFile(this.filePath, JSON.stringify(wishlist, null, 2));
-        } catch (error) {
-            console.error('Error saving wishlist:', error);
-            throw error;
-        }
-    }
-
-    async addItem(item) {
-        const wishlist = await this.readWishlist();
-        const newItem = {
-            id: Date.now(),
-            ...item,
-            contributions: [],
-            totalContributed: 0,
-            fulfilled: false,
-            createdAt: new Date().toISOString()
-        };
-        wishlist.push(newItem);
-        await this.saveWishlist(wishlist);
-        return newItem;
-    }
-
-    async getItems() {
-        return this.readWishlist();
-    }
-
-    async addContribution(itemId, contribution) {
-        const wishlist = await this.readWishlist();
-        const item = wishlist.find(i => i.id === itemId);
-        
-        if (!item) {
-            throw new Error('Item not found');
-        }
-
-        item.contributions.push({
-            id: Date.now(),
-            ...contribution,
-            createdAt: new Date().toISOString()
-        });
-
-        item.totalContributed = item.contributions.reduce(
-            (sum, c) => sum + c.amount, 
-            0
-        );
-
-        if (item.totalContributed >= item.price && !item.fulfilled) {
-            item.fulfilled = true;
-            // Here you would trigger the Shopify order creation
-        }
-
-        await this.saveWishlist(wishlist);
-        return item;
-    }
+  async addItem(item) {
+    const items = await this.getItems();
+    const newItem = {
+      id: Date.now().toString(),
+      ...item,
+      totalContributed: 0,
+      contributions: [],
+      createdAt: new Date().toISOString()
+    };
+    items.push(newItem);
+    await this.saveItems(items);
+    return newItem;
+  }
 }
