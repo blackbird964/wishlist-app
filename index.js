@@ -13,7 +13,11 @@ const __dirname = path.dirname(__filename);
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'https://wishgranted-test.myshopify.com',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type']
+  }));
 app.use(express.json());
 app.use(express.static('public'));  // Add this line
 
